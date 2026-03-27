@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Job Scam Detector</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body style="font-family: Arial; text-align: center; background: #f5f5f5;">
+
+    <h1 style="color: #333;">🚀 AI Job Scam Detector</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <textarea name="job_text" rows="6" cols="60"
+            placeholder="Paste job description here..."
+            style="padding:10px; border-radius:10px;"></textarea><br><br>
+
+        <button type="submit"
+            style="padding:10px 20px; border:none; background:#007BFF; color:white; border-radius:8px;">
+            Check
+        </button>
+    </form>
+
+    {% if result %}
+        <h2>{{ result }}</h2>
+    {% endif %}
+
+    {% if risk %}
+    <!-- FLEX CONTAINER (SIDE BY SIDE) -->
+    <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin-top:30px;">
+
+        <!-- LEFT: Risk Text + Progress Bar -->
+        <div style="width:50%; text-align:left;">
+
+            <h3>Risk Level: {{ risk }}%</h3>
+
+            <div style="width:100%; background:#ddd; border-radius:10px;">
+                <div style="width: {{ risk }}%;
+                            background:
+                            {% if risk > 70 %}#e96b6b
+                            {% elif risk > 40 %}orange
+                            {% else %}green
+                            {% endif %};
+                            color:white; padding:10px; border-radius:10px;">
+                    {{ risk }}%
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT: Chart -->
+        <div style="width:250px; height:250px;">
+            <canvas id="riskChart"></canvas>
+        </div>
+
+    </div>
+    {% endif %}
+
+    {% if risk %}
+    <script>
+        const ctx = document.getElementById('riskChart').getContext('2d');
+
+        const riskValue = {{ risk }};
+
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Risk Level'],
+                datasets: [{
+                    label: 'Risk %',
+                    data: [riskValue],
+                    backgroundColor: [
+                        riskValue > 70 ? '#e96b6b' :
+                        riskValue > 40 ? 'orange' : 'green'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1500
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    </script>
+    {% endif %}
+
+</body>
+</html>
